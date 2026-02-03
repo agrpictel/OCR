@@ -4,7 +4,10 @@ services:
     env: python
     plan: free
     buildCommand: |
-      apt-get update && apt-get install -y tesseract-ocr tesseract-ocr-spa tesseract-ocr-eng poppler-utils
+      apt-get update && apt-get install -y \
+        tesseract-ocr tesseract-ocr-spa tesseract-ocr-eng \
+        ghostscript qpdf unpaper \
+        poppler-utils
       pip install --upgrade pip
       pip install -r requirements.txt
     startCommand: gunicorn app:app --bind 0.0.0.0:$PORT --timeout 600 --workers 2 --threads 4 --worker-class gthread
