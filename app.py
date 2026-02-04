@@ -63,7 +63,7 @@ def run_ocrmypdf(input_path, output_path, lang='spa+eng', timeout=1200):
     """
     cmd = [
         'ocrmypdf',
-        '--skip-text',
+        '--redo-ocr',
         '--rotate-pages',
         '--deskew',
         '--clean',
@@ -335,23 +335,14 @@ def upload_file():
             'output_path': output_path
         }
         
-        # Detectar si tiene texto extraíble
-        has_text = has_extractable_text(input_path)
-        
-        # Procesar en un hilo separado
-        if has_text:
-            print("PDF tiene texto extraíble - usando extracción rápida")
-            thread = Thread(
-                target=process_pdf_with_text,
-                args=(job_id, input_path, output_path)
-            )
-        else:
-            print("PDF requiere OCR - usando Tesseract")
-            thread = Thread(
-                target=process_pdf_with_ocr,
-                args=(job_id, input_path, output_path)
-            )
-        
+        # Nota: muchos PDFs "mixtos" (texto + páginas escaneadas) engañan a extract_text().
+        # Para asegurar que se OCR-ean las imágenes y se mantenga un PDF final legible,
+        # SIEMPRE pasamos por ocrmypdf (modo híbrido).
+        thread = Thread(
+            target=process_pdf_with_ocr,
+            args=(job_id, input_path, output_path)
+        )
+
         thread.daemon = True
         thread.start()
         
