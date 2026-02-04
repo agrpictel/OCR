@@ -1,19 +1,17 @@
 services:
   - type: web
-    name: pdf-ocr-app
+    name: ocr-pdf
     env: python
     plan: free
     buildCommand: |
-      apt-get update && apt-get install -y \
-        tesseract-ocr tesseract-ocr-spa tesseract-ocr-eng \
-        ghostscript qpdf unpaper \
-        poppler-utils
-      pip install --upgrade pip
+      apt-get update
+      apt-get install -y \
+        tesseract-ocr \
+        tesseract-ocr-spa \
+        tesseract-ocr-eng \
+        ghostscript \
+        qpdf \
+        poppler-utils \
+        unpaper
       pip install -r requirements.txt
-    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT --timeout 600 --workers 2 --threads 4 --worker-class gthread
-    healthCheckPath: /
-    envVars:
-      - key: PYTHON_VERSION
-        value: 3.11.9
-      - key: WEB_CONCURRENCY
-        value: 2
+    startCommand: gunicorn app:app
